@@ -77,12 +77,12 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo,' . $id . '|max:255',
-            'imagen' => 'nullable|image',
+            'imagen' => 'required',
         ]);
 
-        if ($request->hasFile('imagen')) {
-            $cliente->imagen = file_get_contents($request->file('imagen'));
-        }
+        // if ($request->hasFile('imagen')) {
+        //     $cliente->imagen = file_get_contents($request->file('imagen'));
+        // }
 
         $cliente->update([
             'nombre' => $validated['nombre'],
