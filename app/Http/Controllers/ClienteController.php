@@ -35,7 +35,7 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
-            'imagen' => 'required|string',
+            'imagen' => 'nullable|string',
         ]);
     
         if ($validator->fails()) {
@@ -64,7 +64,6 @@ class ClienteController extends Controller
         if($cliente->null){
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
-        $imagen = $cliente->imagen ? base64_encode($cliente->imagen) : null;
 
         return response()->json([
             'nombre' => $cliente->nombre,
@@ -93,7 +92,7 @@ class ClienteController extends Controller
             'apellido' => 'string|max:255',
             'direccion' => 'string|max:255',
             'correo' => 'email|unique:clientes,correo,' . $id . '|max:255',
-            'imagen' => 'image',
+            'imagen' => 'nullable|string',
         ]);
     
         if ($validator->fails()){
@@ -122,8 +121,8 @@ class ClienteController extends Controller
             $cliente->correo = $request->get('correo');
         }   
     
-        if ($request->hasFile('imagen')) {
-            $cliente->imagen = file_get_contents($request->file('imagen')->getRealPath());
+        if ($request->has('imagen')) {
+            $cliente->imagen = $request->get('imagen');
         }
 
         $cliente->save();

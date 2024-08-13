@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('apellido');
             $table->string('direccion');
             $table->string('correo')->unique();
-            $table->string('image')->nullable();
+            $table->string('imagen')->nullable();
             $table->timestamps();
         });
     }
