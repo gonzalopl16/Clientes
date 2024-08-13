@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ClienteController extends Controller
 {
@@ -29,24 +30,28 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
             'imagen' => 'nullable|image',
         ]);
-
-        $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')) : null;
-
+    
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+    
+        $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')->getRealPath()) : null;
+    
         Cliente::create([
-            'nombre' => $validated['nombre'],
-            'apellido' => $validated['apellido'],
-            'direccion' => $validated['direccion'],
-            'correo' => $validated['correo'],
+            'nombre' => $request->get('nombre'),
+            'apellido' => $request->get('apellido'),
+            'direccion' => $request->get('direccion'),
+            'correo' => $request->get('correo'),
             'imagen' => $imagen,
         ]);
-
+    
         return response()->json(['message' => 'Cliente creado correctamente'], 201);   
     }
 
@@ -55,7 +60,19 @@ class ClienteController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $cliente = Cliente::findOrFail($id);
+        if($cliente->null){
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+        $imagen = $cliente->imagen ? base64_encode($cliente->imagen) : null;
+
+        return response()->json([
+            'nombre' => $cliente->nombre,
+            'apellido' => $cliente->apellido,
+            'direccion' => $cliente->direccion,
+            'correo' => $cliente->correo,
+            'imagen' => $imagen,
+        ]);
     }
 
     /**
@@ -71,27 +88,36 @@ class ClienteController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $cliente = Cliente::findOrFail($id);
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo,' . $id . '|max:255',
             'imagen' => 'nullable|image',
         ]);
-
-        if ($request->hasFile('imagen')) {
-            $cliente->imagen = file_get_contents($request->file('imagen'));
+    
+        if ($validator->fails()){
+            return response()->json($validator->errors(), 400);
         }
+    
+        $cliente = Cliente::findOrFail($id);
 
+        if($cliente->null){
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
+    
+        if ($request->hasFile('imagen')) {
+            $cliente->imagen = file_get_contents($request->file('imagen')->getRealPath());
+        }
+    
         $cliente->update([
-            'nombre' => $validated['nombre'],
-            'apellido' => $validated['apellido'],
-            'direccion' => $validated['direccion'],
-            'correo' => $validated['correo'],
+            'nombre' => $request->get('nombre'),
+            'apellido' => $request->get('apellido'),
+            'direccion' => $request->get('direccion'),
+            'correo' => $request->get('correo'),
         ]);
-
-        
+    
+        return response()->json(['message' => 'Cliente actualizado correctamente'], 200);   
     }
 
     /**
@@ -100,6 +126,9 @@ class ClienteController extends Controller
     public function destroy(string $id)
     {
         $cliente = Cliente::findOrFail($id);
+        if($cliente->null){
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
         $cliente->delete();
         return response()->json(['message' => 'Cliente eliminado correctamente'], 200);
     }
