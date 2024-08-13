@@ -34,17 +34,17 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
-            'imagen' => 'required',
+            'imagen' => 'nullable|image',
         ]);
 
-        // $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')) : null;
+        $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')) : null;
 
         Cliente::create([
             'nombre' => $validated['nombre'],
             'apellido' => $validated['apellido'],
             'direccion' => $validated['direccion'],
             'correo' => $validated['correo'],
-            'imagen' => $validated['imagen'],
+            'imagen' => $imagen,
         ]);
 
         return response()->json(['message' => 'Cliente creado correctamente'], 201);   
@@ -77,12 +77,12 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo,' . $id . '|max:255',
-            'imagen' => 'required',
+            'imagen' => 'nullable|image',
         ]);
 
-        // if ($request->hasFile('imagen')) {
-        //     $cliente->imagen = file_get_contents($request->file('imagen'));
-        // }
+        if ($request->hasFile('imagen')) {
+            $cliente->imagen = file_get_contents($request->file('imagen'));
+        }
 
         $cliente->update([
             'nombre' => $validated['nombre'],
