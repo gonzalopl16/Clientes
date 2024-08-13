@@ -35,7 +35,7 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
-            'imagen' => 'nullable|image',
+            'imagen' => 'nullable',
         ]);
     
         if ($validator->fails()) {
