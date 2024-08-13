@@ -89,11 +89,11 @@ class ClienteController extends Controller
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'direccion' => 'required|string|max:255',
-            'correo' => 'required|email|unique:clientes,correo,' . $id . '|max:255',
-            'imagen' => 'nullable|image',
+            'nombre' => 'string|max:255',
+            'apellido' => 'string|max:255',
+            'direccion' => 'string|max:255',
+            'correo' => 'email|unique:clientes,correo,' . $id . '|max:255',
+            'imagen' => 'image',
         ]);
     
         if ($validator->fails()){
@@ -105,17 +105,28 @@ class ClienteController extends Controller
         if($cliente->null){
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
+
+        if($request->has('nombre')){
+            $cliente->nombre = $request->get('nombre');
+        }
+
+        if($request->has('apellido')){
+            $cliente->apellido = $request->get('apellido');
+        }
+
+        if($request->has('direccion')){
+            $cliente->direccion = $request->get('direccion');
+        }
+
+        if($request->has('correo')){
+            $cliente->correo = $request->get('correo');
+        }   
     
         if ($request->hasFile('imagen')) {
             $cliente->imagen = file_get_contents($request->file('imagen')->getRealPath());
         }
-    
-        $cliente->update([
-            'nombre' => $request->get('nombre'),
-            'apellido' => $request->get('apellido'),
-            'direccion' => $request->get('direccion'),
-            'correo' => $request->get('correo'),
-        ]);
+
+        $cliente->save();
     
         return response()->json(['message' => 'Cliente actualizado correctamente'], 200);   
     }
