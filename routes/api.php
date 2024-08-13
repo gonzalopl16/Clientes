@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
 use App\Models\Cliente;
 use GuzzleHttp\Client;
@@ -11,3 +12,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::resource('clientes', ClienteController::class);
+
+Route::post('/registrar', [AuthController::class, 'registrar']);
+Route::post('/login', [AuthController::class, 'login']);
