@@ -13,5 +13,7 @@ Route::get('/user', function (Request $request) {
 
 Route::resource('clientes', ClienteController::class);
 
-Route::post('/registrar', [AuthController::class, 'registrar']);
+Route::post('/registrar', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/usuarios',[AuthController::class, 'index']);

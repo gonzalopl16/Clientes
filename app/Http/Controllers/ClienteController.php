@@ -35,21 +35,21 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
-            'imagen' => 'nullable',
+            'imagen' => 'required|string',
         ]);
     
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
     
-        $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')->getRealPath()) : null;
+        // $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')->getRealPath()) : null;
     
         Cliente::create([
             'nombre' => $request->get('nombre'),
             'apellido' => $request->get('apellido'),
             'direccion' => $request->get('direccion'),
             'correo' => $request->get('correo'),
-            'imagen' => $imagen,
+            'imagen' => $request->get('imagen'),
         ]);
     
         return response()->json(['message' => 'Cliente creado correctamente'], 201);   
@@ -71,7 +71,7 @@ class ClienteController extends Controller
             'apellido' => $cliente->apellido,
             'direccion' => $cliente->direccion,
             'correo' => $cliente->correo,
-            'imagen' => $imagen,
+            'imagen' => $cliente->imagen,
         ]);
     }
 
