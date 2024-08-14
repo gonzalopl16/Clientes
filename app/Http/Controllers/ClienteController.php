@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ClienteController extends Controller
@@ -38,6 +39,10 @@ class ClienteController extends Controller
             'imagen' => 'required|image|dimensions:min_widht=100,min_height=100',
         ]);
     
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
         $cliente = new Cliente($request->all());
         $path = $request->file('imagen')->store('public/clientes');
 
@@ -47,9 +52,6 @@ class ClienteController extends Controller
 
         return response()->json(['message' => 'Cliente creado correctamente'], 201);
 
-        // if ($validator->fails()) {
-        //     return response()->json($validator->errors(), 400);
-        // }
     
         // // $imagen = $request->file('imagen') ? file_get_contents($request->file('imagen')->getRealPath()) : null;
     
@@ -101,7 +103,7 @@ class ClienteController extends Controller
             'apellido' => 'string|max:255',
             'direccion' => 'string|max:255',
             'correo' => 'email|unique:clientes,correo,' . $id . '|max:255',
-            'imagen' => 'nullable|string',
+            'imagen' => 'nullable|image|dimensions:min_widht=100,min_height=100',
         ]);
     
         if ($validator->fails()){
@@ -130,8 +132,12 @@ class ClienteController extends Controller
             $cliente->correo = $request->get('correo');
         }   
     
-        if ($request->has('imagen')) {
-            $cliente->imagen = $request->get('imagen');
+        if ($request->hasFile('imagen')) {
+            if($cliente->imagen){
+                Storage::delete($cliente->imagen);
+            }
+            $path = $request->file('imagen')->store('public/clientes');
+            $cliente->imagen = $path;
         }
 
         $cliente->save();
@@ -148,6 +154,7 @@ class ClienteController extends Controller
         if($cliente->null){
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
+        $cliente->imagen ? Storage::delete($cliente->imagen) : null;
         $cliente->delete();
         return response()->json(['message' => 'Cliente eliminado correctamente'], 200);
     }
