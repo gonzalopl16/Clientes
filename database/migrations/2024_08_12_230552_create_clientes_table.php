@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('direccion');
             $table->string('correo')->unique();
             $table->string('imagen')->nullable();
-            $table->date('fecha_nacimiento')->nullable();
-            $table->string('distrito')->nullable();
+            // $table->date('fecha_nacimiento')->nullable();
+            // $table->string('distrito')->nullable();
             $table->timestamps();
         });
     }
