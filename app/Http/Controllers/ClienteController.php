@@ -36,19 +36,30 @@ class ClienteController extends Controller
             'apellido' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
-            'imagen' => 'required|image|dimensions:min_widht=100,min_height=100',
+            'imagen' => 'nullable|image|dimensions:min_widht=100,min_height=100',
         ]);
     
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
 
-        $cliente = new Cliente($request->all());
-        $path = $request->file('imagen')->store('public/clientes');
+        // $cliente = new Cliente($request->all());
+        // $path = $request->file('imagen')->store('public/clientes');
 
-        $cliente->imagen = $path;
+        $imagen = $request->hasFile('imagen') ? $request->file('imagen')->store('public/clientes') : null;
 
-        $cliente->save();
+         Cliente::create([
+            'nombre' => $request->get('nombre'),
+            'apellido' => $request->get('apellido'),
+            'direccion' => $request->get('direccion'),
+            'correo' => $request->get('correo'),
+            'imagen' => $imagen,
+        ]);
+
+
+        // $cliente->imagen = $path;
+
+        // $cliente->save();
 
         return response()->json(['message' => 'Cliente creado correctamente'], 201);
 
