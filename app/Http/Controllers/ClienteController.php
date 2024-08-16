@@ -37,6 +37,8 @@ class ClienteController extends Controller
             'direccion' => 'required|string|max:255',
             'correo' => 'required|email|unique:clientes,correo|max:255',
             'imagen' => 'nullable|image|dimensions:min_widht=100,min_height=100',
+            'fecha_nacimiento' => 'nullable|date',
+            'distrito' => 'nullable|string|max:255',
         ]);
     
         if ($validator->fails()) {
@@ -54,6 +56,8 @@ class ClienteController extends Controller
             'direccion' => $request->get('direccion'),
             'correo' => $request->get('correo'),
             'imagen' => $imagen,
+            'fecha_nacimiento' => $request->get('fecha_nacimiento'),
+            'distrito' => $request->get('distrito'),
         ]);
 
 
@@ -93,6 +97,8 @@ class ClienteController extends Controller
             'direccion' => $cliente->direccion,
             'correo' => $cliente->correo,
             'imagen' => $cliente->imagen,
+            'fecha_nacimiento' => $cliente->fecha_nacimiento,
+            'distrito' => $cliente->distrito,
         ]);
     }
 
@@ -115,6 +121,8 @@ class ClienteController extends Controller
             'direccion' => 'string|max:255',
             'correo' => 'email|unique:clientes,correo,' . $id . '|max:255',
             'imagen' => 'nullable|image|dimensions:min_widht=100,min_height=100',
+            'fecha_nacimiento' => 'date',
+            'distrito' => 'string|max:255',
         ]);
     
         if ($validator->fails()){
@@ -149,6 +157,14 @@ class ClienteController extends Controller
             }
             $path = $request->file('imagen')->store('public/clientes');
             $cliente->imagen = $path;
+        }
+
+        if($request->has('fecha_nacimiento')){
+            $cliente->fecha_nacimiento = $request->get('fecha_nacimiento');
+        }
+
+        if($request->has('distrito')){
+            $cliente->distrito = $request->get('distrito');
         }
 
         $cliente->save();

@@ -15,5 +15,7 @@ class Cliente extends Model
         'direccion',
         'correo',
         'imagen',
+        'fecha_nacimiento',
+        'distrito'
     ];
 }
